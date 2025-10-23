@@ -1,0 +1,63 @@
+/* تنظیمات کلی صفحه */
+body {
+  margin: 0;
+  height: 100vh;
+  background: linear-gradient(to bottom, #FFD700, #FFA500); /* زرد به نارنجی */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-family: sans-serif;
+}
+/* باکس شیشه‌ای فرم */
+.glass-box {
+  background: rgba(255, 255, 255, 0.2); /* شفافیت */
+  backdrop-filter: blur(10px);          /* افکت شیشه‌ای */
+  border-radius: 15px;
+  padding: 30px 40px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+  width: 320px;
+  color: #000;
+}
+
+/* استایل فیلدهای ورودی */
+.glass-box input {
+  width: 100%;
+  padding: 10px;
+  margin: 8px 0 16px;
+  border: none;
+  border-radius: 50px;
+  font-size: 14px;
+}
+
+/* استایل لیبل‌ها */
+.glass-box label {
+  display: block;
+  margin-top: 10px;
+  font-size: 14px;
+}
+
+/* عنوان فرم */
+.glass-box h1 {
+  text-align: center;
+  font-size: 40px;
+  margin-bottom: 20px;
+  color: BLACK;
+}
+
+input[type="submit"] {
+  background-color: #ff6600;
+  color: white;
+  border: none;
+  padding: 12px 20px;
+  border-radius: 50px;
+  font-size: 16px;
+  cursor: pointer;
+  display: block;
+  margin: 20px auto 0;
+  transition: background-color 0.3s ease;
+}
+
+/* افکت هاور روی دکمه */
+input[type="submit"]:hover {
+  background-color: #e65c00;
+}
