@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, send_from_directory, abort
+from flask import Flask, render_template, request, send_from_directory, abort, redirect, url_for
 from pathlib import Path
 from datetime import datetime
 from werkzeug.utils import secure_filename
@@ -77,7 +77,6 @@ def check_access(auth):
     user = USERS.get(auth.username)
     if not user:
         return False
-    # بررسی رمز عبور
     if hashlib.sha256(auth.password.encode()).hexdigest() != user["password_hash"]:
         return False
     return True
@@ -87,7 +86,6 @@ def download_file(filename):
     auth = request.authorization
     if not check_access(auth):
         return ('Unauthorized', 401, {'WWW-Authenticate': 'Basic realm="Login Required"'})
-
     file_path = DATA_DIR / filename
     if file_path.exists():
         return send_from_directory(DATA_DIR, filename, as_attachment=True)
@@ -98,20 +96,18 @@ def list_files():
     auth = request.authorization
     if not check_access(auth):
         return ('Unauthorized', 401, {'WWW-Authenticate': 'Basic realm="Login Required"'})
-
     files = sorted([f.name for f in DATA_DIR.iterdir() if f.is_file()], reverse=True)
-    return "<br>".join([f'<a href="/download/{f}">{f}</a> | <form method="POST" action="/delete/{f}" style="display:inline;"><button type="submit">حذف</button></form>' for f in files])
+    return render_template('list.html', files=files)
 
 @app.route('/delete/<filename>', methods=['POST'])
 def delete_file(filename):
     auth = request.authorization
     if not check_access(auth):
         return ('Unauthorized', 401, {'WWW-Authenticate': 'Basic realm="Login Required"'})
-
     file_path = DATA_DIR / filename
     if file_path.exists():
         file_path.unlink()
-        return f"{filename} حذف شد."
+        return redirect(url_for('list_files'))
     return "فایل پیدا نشد."
 
 if __name__ == '__main__':
