@@ -64,18 +64,35 @@ def submit():
 
     return render_template('index.html', message="فرم شما با موفقیت ثبت گردید.")
 
-# تنظیمات دسترسی فقط برای تو
-USERNAME = "seyed"
-# هش رمز عبور (SHA-256)
-PASSWORD_HASH = hashlib.sha256("seyed1234kazemi".encode()).hexdigest()
+# تعریف کاربر با username, nickname و هش رمز عبور
+# تعریف کاربر با username, nickname و هش رمز عبور
+USERS = {
+    "seyed": {
+        "nickname": "ssk",
+        "password_hash": hashlib.sha256("Seyed1234Kazemi".encode()).hexdigest()
+    }
+}
 
-def check_password(password_input):
-    return hashlib.sha256(password_input.encode()).hexdigest() == PASSWORD_HASH
+
+def check_access(auth):
+    if not auth:
+        return False
+    user = USERS.get(auth.username)
+    if not user:
+        return False
+    # بررسی رمز عبور
+    if hashlib.sha256(auth.password.encode()).hexdigest() != user["password_hash"]:
+        return False
+    # بررسی لقب
+    nickname_input = request.headers.get("X-Nickname", "")
+    if nickname_input != user["nickname"]:
+        return False
+    return True
 
 @app.route('/download/<filename>')
 def download_file(filename):
     auth = request.authorization
-    if not auth or auth.username != USERNAME or not check_password(auth.password):
+    if not check_access(auth):
         return ('Unauthorized', 401, {'WWW-Authenticate': 'Basic realm="Login Required"'})
 
     file_path = DATA_DIR / filename
@@ -86,11 +103,23 @@ def download_file(filename):
 @app.route('/list')
 def list_files():
     auth = request.authorization
-    if not auth or auth.username != USERNAME or not check_password(auth.password):
+    if not check_access(auth):
         return ('Unauthorized', 401, {'WWW-Authenticate': 'Basic realm="Login Required"'})
 
     files = sorted([f.name for f in DATA_DIR.iterdir() if f.is_file()], reverse=True)
-    return "<br>".join([f'<a href="/download/{f}">{f}</a>' for f in files])
+    return "<br>".join([f'<a href="/download/{f}">{f}</a> | <form method="POST" action="/delete/{f}" style="display:inline;"><button type="submit">حذف</button></form>' for f in files])
+
+@app.route('/delete/<filename>', methods=['POST'])
+def delete_file(filename):
+    auth = request.authorization
+    if not check_access(auth):
+        return ('Unauthorized', 401, {'WWW-Authenticate': 'Basic realm="Login Required"'})
+
+    file_path = DATA_DIR / filename
+    if file_path.exists():
+        file_path.unlink()
+        return f"{filename} حذف شد."
+    return "فایل پیدا نشد."
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 5000)))
