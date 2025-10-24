@@ -23,9 +23,10 @@ def submit():
     safe_email = email.replace('@', '_at_').replace('.', '_')
     filename = f"{safe_email}_{timestamp}.txt"
 
-    # مسیر دسکتاپ (برای ویندوز)
-    desktop_path = os.path.join(os.path.expanduser("~"), "Desktop")
-    file_path = os.path.join(desktop_path, filename)
+    # مسیر ذخیره داخل پروژه (پوشه data)
+    data_path = os.path.join(os.getcwd(), "data")
+    os.makedirs(data_path, exist_ok=True)
+    file_path = os.path.join(data_path, filename)
 
     # نوشتن اطلاعات در فایل
     with open(file_path, 'w', encoding='utf-8') as f:
