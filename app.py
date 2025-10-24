@@ -1,34 +1,29 @@
-from flask import Flask, render_template, request
-import os
-from datetime import datetime
+from flask import Flask, render_template, request, send_from_directory, abort
 from pathlib import Path
+from datetime import datetime
 from werkzeug.utils import secure_filename
 import re
 
 app = Flask(__name__)
 
-# مسیر ذخیره فایل‌ها (پوشه users)
+# پوشه ذخیره فایل‌ها
 DATA_DIR = Path(app.root_path) / "users"
 DATA_DIR.mkdir(parents=True, exist_ok=True)
 
-# لیست دامنه‌های ایمیل موقت
-DISPOSABLE_EMAIL_DOMAINS = [
-    "mailinator.com", "tempmail.com", "guerrillamail.com", "10minutemail.com", "maildrop.cc"
-]
-
-# تابع برای اعتبارسنجی شماره تلفن
+# اعتبارسنجی شماره تلفن
 def validate_phone(phone):
     pattern = r"^(0901|0902|0903|0930|0933|0935|0936|0937|0938|0939|0910|0911|0912|0913|0914|0915|0916|0917|0918|0919|0990|0991|0992|0993)\d{7}$"
     return re.match(pattern, phone)
 
-# تابع برای اعتبارسنجی ایمیل
+# اعتبارسنجی ایمیل
+DISPOSABLE_EMAIL_DOMAINS = ["mailinator.com", "tempmail.com", "guerrillamail.com", "10minutemail.com", "maildrop.cc"]
 def validate_email_address(email):
     email_pattern = r"(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)"
     if not re.match(email_pattern, email):
-        return False, "فرمت ایمیل وارد شده صحیح نیست."
+        return False, "فرمت ایمیل صحیح نیست."
     domain = email.split('@')[1]
     if domain in DISPOSABLE_EMAIL_DOMAINS:
-        return False, "ایمیل وارد شده از نوع ایمیل موقت است. لطفاً ایمیل معتبر وارد کنید."
+        return False, "ایمیل موقت قابل قبول نیست."
     return True, ""
 
 @app.route('/')
@@ -44,20 +39,14 @@ def submit():
     password = request.form.get('password', '').strip()
     gamename = request.form.get('gamename', '').strip()
 
-    # اعتبارسنجی نام و نام خانوادگی
     if len(fullname) < 7 or len(fullname) > 40:
-        return render_template('index.html', message="نام و نام خانوادگی باید بین 7 تا 40 کاراکتر باشد.")
-
-    # اعتبارسنجی شماره تلفن
+        return render_template('index.html', message="نام و نام خانوادگی بین 7 تا 40 کاراکتر باشد.")
     if not validate_phone(phone):
-        return render_template('index.html', message="فرمت شماره تلفن صحیح نیست. لطفاً شماره تلفن معتبر وارد کنید.")
-
-    # اعتبارسنجی ایمیل
-    is_valid_email, email_message = validate_email_address(email)
+        return render_template('index.html', message="شماره تلفن معتبر نیست.")
+    is_valid_email, msg = validate_email_address(email)
     if not is_valid_email:
-        return render_template('index.html', message=email_message)
+        return render_template('index.html', message=msg)
 
-    # ذخیره اطلاعات در فایل تکست جداگانه
     timestamp = datetime.utcnow().strftime('%Y%m%d_%H%M%S')
     safe_email = secure_filename(email.replace('@', '_at_')) or "unknown"
     filename = f"{safe_email}_{timestamp}.txt"
@@ -73,6 +62,29 @@ def submit():
 
     return render_template('index.html', message="فرم شما با موفقیت ثبت گردید.")
 
+# تنظیمات دسترسی فقط برای تو
+USERNAME = "admin"  # نام کاربری خودت
+PASSWORD = "1234"   # رمز عبور خودت
+
+@app.route('/download/<filename>')
+def download_file(filename):
+    auth = request.authorization
+    if not auth or auth.username != USERNAME or auth.password != PASSWORD:
+        return ('Unauthorized', 401, {'WWW-Authenticate': 'Basic realm="Login Required"'})
+    
+    file_path = DATA_DIR / filename
+    if file_path.exists():
+        return send_from_directory(DATA_DIR, filename, as_attachment=True)
+    return abort(404)
+
+@app.route('/list')
+def list_files():
+    auth = request.authorization
+    if not auth or auth.username != USERNAME or auth.password != PASSWORD:
+        return ('Unauthorized', 401, {'WWW-Authenticate': 'Basic realm="Login Required"'})
+    
+    files = sorted([f.name for f in DATA_DIR.iterdir() if f.is_file()], reverse=True)
+    return "<br>".join([f'<a href="/download/{f}">{f}</a>' for f in files])
+
 if __name__ == '__main__':
-    port = int(os.environ.get('PORT', 5000))
-    app.run(host='0.0.0.0', port=port)
+    app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 5000)))
