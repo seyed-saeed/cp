@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, send_from_directory, abort, redirect, url_for
+from flask import Flask, render_template, request, send_from_directory, abort, redirect
 from pathlib import Path
 from datetime import datetime
 from werkzeug.utils import secure_filename
@@ -8,10 +8,15 @@ import os
 
 app = Flask(__name__)
 
+# -------------------------------
 # پوشه ذخیره فایل‌ها
 DATA_DIR = Path(app.root_path) / "users"
 DATA_DIR.mkdir(parents=True, exist_ok=True)
 
+# مسیر مخفی لیست فایل‌ها
+HIDDEN_LIST_URL = "x7g9q3_list_dashboard_92kjf"
+
+# -------------------------------
 # اعتبارسنجی شماره تلفن
 def validate_phone(phone):
     pattern = r"^(0901|0902|0903|0930|0933|0935|0936|0937|0938|0939|0910|0911|0912|0913|0914|0915|0916|0917|0918|0919|0990|0991|0992|0993)\d{7}$"
@@ -28,6 +33,7 @@ def validate_email_address(email):
         return False, "ایمیل موقت قابل قبول نیست."
     return True, ""
 
+# -------------------------------
 @app.route('/')
 def index():
     return render_template('index.html')
@@ -64,7 +70,8 @@ def submit():
 
     return render_template('index.html', message="فرم شما با موفقیت ثبت گردید.")
 
-# تعریف کاربران با username و هش رمز عبور
+# -------------------------------
+# کاربران و هش رمز عبور
 USERS = {
     "seyed": {
         "password_hash": hashlib.sha256("Seyed1234Kazemi".encode()).hexdigest()
@@ -81,6 +88,7 @@ def check_access(auth):
         return False
     return True
 
+# -------------------------------
 @app.route('/download/<filename>')
 def download_file(filename):
     auth = request.authorization
@@ -91,7 +99,8 @@ def download_file(filename):
         return send_from_directory(DATA_DIR, filename, as_attachment=True)
     return abort(404)
 
-@app.route('/list')
+# -------------------------------
+@app.route(f'/{HIDDEN_LIST_URL}')
 def list_files():
     auth = request.authorization
     if not check_access(auth):
@@ -107,8 +116,10 @@ def delete_file(filename):
     file_path = DATA_DIR / filename
     if file_path.exists():
         file_path.unlink()
-        return redirect(url_for('list_files'))
+        # هدایت به مسیر مخفی
+        return redirect(f'/{HIDDEN_LIST_URL}')
     return "فایل پیدا نشد."
 
+# -------------------------------
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 5000)))
