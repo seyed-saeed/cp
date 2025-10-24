@@ -32,6 +32,8 @@ body {
   appearance: none; /* حذف ظاهر پیش‌فرض مرورگر */
   -webkit-appearance: none; /* برای Safari */
   -moz-appearance: none;    /* برای Firefox */
+  box-sizing: border-box;   /* برای اینکه padding و border در اندازه لحاظ شوند */
+  height: 50px; /* تنظیم ارتفاع یکسان با فیلدهای ورودی */
 }
 
 /* استایل منوی کشویی در حالت فوکوس */
