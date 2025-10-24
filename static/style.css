@@ -77,13 +77,14 @@ input[type="submit"]:hover {
 }
 
 /* استایل برای پیغام‌ها */
+/* استایل برای پیغام موفقیت */
 #popup {
-  background-color: #fff;
+  background-color: #ffffff; /* پس‌زمینه سفید */
+  color: #007BFF; /* رنگ متن آبی */
   padding: 20px;
   border-radius: 10px;
-  border: 2px solid #333;
-  color: #333;
-  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+  border: 2px solid #007BFF; /* حاشیه آبی */
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1); /* سایه برای زیبایی */
   position: fixed;
   top: 40%;
   left: 50%;
@@ -93,6 +94,15 @@ input[type="submit"]:hover {
   width: 80%;
   max-width: 400px;
   font-size: 16px;
+  font-weight: bold; /* ضخیم‌تر شدن فونت */
+}
+
+/* افکت‌ها برای متنی که هنگام نمایش پیام ظاهر می‌شود */
+#popup p {
+  margin: 0;
+  padding: 0;
+  font-size: 18px;
+  line-height: 1.5;
 }
 
 /* برای موبایل و صفحه‌های کوچکتر */
@@ -115,3 +125,4 @@ input[type="submit"]:hover {
     font-size: 14px;
   }
 }
+
