@@ -64,15 +64,12 @@ def submit():
 
     return render_template('index.html', message="فرم شما با موفقیت ثبت گردید.")
 
-# تعریف کاربر با username, nickname و هش رمز عبور
-# تعریف کاربر با username, nickname و هش رمز عبور
+# تعریف کاربران با username و هش رمز عبور
 USERS = {
     "seyed": {
-        "nickname": "ssk",
         "password_hash": hashlib.sha256("Seyed1234Kazemi".encode()).hexdigest()
     }
 }
-
 
 def check_access(auth):
     if not auth:
@@ -82,10 +79,6 @@ def check_access(auth):
         return False
     # بررسی رمز عبور
     if hashlib.sha256(auth.password.encode()).hexdigest() != user["password_hash"]:
-        return False
-    # بررسی لقب
-    nickname_input = request.headers.get("X-Nickname", "")
-    if nickname_input != user["nickname"]:
         return False
     return True
 
