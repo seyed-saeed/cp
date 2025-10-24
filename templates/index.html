@@ -16,10 +16,11 @@
        title="شماره تلفن باید 11 رقم باشد و با یکی از پیش‌شماره‌های معتبر (مثل 0912...) شروع شود"
        required>
 
-      <input list="companies" name="company" placeholder="روش اتصال را انتخاب کنید">
-      <datalist id="companies">
-        <option value="اکتیویژن">
-        <option value="فیسبوک">
+  <select name="company" required>
+    <option value="">روش اتصال را انتخاب کنید</option>  <!-- گزینه پیش‌فرض که کاربر باید انتخاب کنه -->
+    <option value="اکتیویژن">اکتیویژن</option>
+    <option value="فیسبوک">فیسبوک</option>
+  </select>
       </datalist>
       <input type="email" name="email" placeholder="ایمیل" required>
       <input type="password" name="password" placeholder="رمز عبور" required>
