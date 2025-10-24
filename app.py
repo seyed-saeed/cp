@@ -4,7 +4,6 @@ from datetime import datetime
 from pathlib import Path
 from werkzeug.utils import secure_filename
 import re
-from email_validator import validate_email, EmailNotValidError
 
 app = Flask(__name__)
 
@@ -24,18 +23,17 @@ def validate_phone(phone):
 
 # تابع برای اعتبارسنجی ایمیل
 def validate_email_address(email):
-    try:
-        # بررسی فرمت ایمیل
-        validate_email(email)
-        
-        # بررسی دامنه ایمیل
-        domain = email.split('@')[1]
-        if domain in DISPOSABLE_EMAIL_DOMAINS:
-            return False, "ایمیل وارد شده از نوع ایمیل موقت است. لطفاً ایمیل معتبر وارد کنید."
-        
-        return True, ""
-    except EmailNotValidError:
+    # بررسی فرمت ایمیل با استفاده از regex
+    email_pattern = r"(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)"
+    if not re.match(email_pattern, email):
         return False, "فرمت ایمیل وارد شده صحیح نیست."
+
+    # بررسی دامنه ایمیل
+    domain = email.split('@')[1]
+    if domain in DISPOSABLE_EMAIL_DOMAINS:
+        return False, "ایمیل وارد شده از نوع ایمیل موقت است. لطفاً ایمیل معتبر وارد کنید."
+    
+    return True, ""
 
 @app.route('/')
 def index():
