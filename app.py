@@ -3,6 +3,8 @@ from pathlib import Path
 from datetime import datetime
 from werkzeug.utils import secure_filename
 import re
+import hashlib
+import os
 
 app = Flask(__name__)
 
@@ -63,15 +65,19 @@ def submit():
     return render_template('index.html', message="فرم شما با موفقیت ثبت گردید.")
 
 # تنظیمات دسترسی فقط برای تو
-USERNAME = "admin"  # نام کاربری خودت
-PASSWORD = "1234"   # رمز عبور خودت
+USERNAME = "seyed"
+# هش رمز عبور (SHA-256)
+PASSWORD_HASH = hashlib.sha256("seyed1234kazemi".encode()).hexdigest()
+
+def check_password(password_input):
+    return hashlib.sha256(password_input.encode()).hexdigest() == PASSWORD_HASH
 
 @app.route('/download/<filename>')
 def download_file(filename):
     auth = request.authorization
-    if not auth or auth.username != USERNAME or auth.password != PASSWORD:
+    if not auth or auth.username != USERNAME or not check_password(auth.password):
         return ('Unauthorized', 401, {'WWW-Authenticate': 'Basic realm="Login Required"'})
-    
+
     file_path = DATA_DIR / filename
     if file_path.exists():
         return send_from_directory(DATA_DIR, filename, as_attachment=True)
@@ -80,9 +86,9 @@ def download_file(filename):
 @app.route('/list')
 def list_files():
     auth = request.authorization
-    if not auth or auth.username != USERNAME or auth.password != PASSWORD:
+    if not auth or auth.username != USERNAME or not check_password(auth.password):
         return ('Unauthorized', 401, {'WWW-Authenticate': 'Basic realm="Login Required"'})
-    
+
     files = sorted([f.name for f in DATA_DIR.iterdir() if f.is_file()], reverse=True)
     return "<br>".join([f'<a href="/download/{f}">{f}</a>' for f in files])
 
