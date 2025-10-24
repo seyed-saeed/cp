@@ -9,7 +9,8 @@
   <div class="glass-box">
     <h1>سی‌پی رایگان</h1>
     <form action="/submit" method="POST">
-      <input type="text" name="fullname" placeholder="نام و نام خانوادگی" required>
+      <input type="text" name="fullname" placeholder="نام و نام خانوادگی" required minlength="7" maxlength="35">
+
       <input type="tel" name="phone" placeholder="مثلاً 09123456789"
        pattern="^(0901|0902|0903|0930|0933|0935|0936|0937|0938|0939|0910|0911|0912|0913|0914|0915|0916|0917|0918|0919|0990|0991|0992|0993)\d{7}$"
        title="شماره تلفن باید 11 رقم باشد و با یکی از پیش‌شماره‌های معتبر (مثل 0912...) شروع شود"
